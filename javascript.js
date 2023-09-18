@@ -1,66 +1,67 @@
 
-const grid = document.querySelector('.container');
+const grid = document.querySelector('.grid');
 
+let gridValue = document.querySelector('.grid-size');
+let gridSize = document.querySelector('input');
 
-let func = function(e){
-    e.target.style.backgroundColor = 'black';
+let squareSize = 8;
+
+createGrid(squareSize);
+
+// Create Squared Divs (cells)
+function createDiv(size) {
+  const div = document.createElement('div');
+  div.classList.add('cell');
+  div.style.width = `${size}px`;
+  div.style.height = `${size}px`;
+
+  return div;
 }
 
-
-function createGrid(){
-    for(let i = 0; i < 256; i++){
-        let div = document.createElement('div');
-        div.classList.add('cell');
-        div.style.border = "1px solid black";
-        div.addEventListener('pointerover', func)     
-        grid.appendChild(div)
+// Create The Grid and appending the children(cells) 
+// this is also why is comes out formatted correctly because of the nested for loop
+// it will do 8 across before moving on to the next row   
+function createGrid(gridSize) {
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      grid.appendChild(createDiv(grid.clientWidth / gridSize));
     }
+  }
 }
 
-
-function removeAllChildNodes(parent){
-    while(parent.firstChild){
-        parent.removeChild(parent.firstChild);
-    }
+// removes the children from current grid
+// then creates a new grid with squareSize
+function reset() {
+  while (grid.firstChild) {
+    grid.removeChild(grid.lastChild);
+  }
+  createGrid(squareSize);
 }
 
+// Add the "active" class to divs with a "cell" class
+grid.addEventListener('pointerover', function (e) {
+  if (e.target.matches('.cell')) {
+    e.target.classList.add('active');
+  }
+});
 
-const screenVal = document.querySelector('.value');
-const slider = document.querySelector('#slider')
-slider.addEventListener('input', function(){
-    let val = document.getElementById('slider').value;
-    screenVal.textContent = val;
-    removeAllChildNodes(grid);
-    grid.setAttribute('style', `grid-template-columns: repeat(${val}, 2fr); grid-template-rows: repeat(${val}, 2fr);`);
-    for (let i = 0; i < val*val; i++){
-        const div = document.createElement('div');
-        div.classList.add('cell');
-        div.addEventListener('pointerover', func)
-    }
-    grid.appendChild(div); 
+// listening for slider input
+// change value of squareSize and display updated correct size
+gridSize.addEventListener('input', function (e) {
+  squareSize = e.target.value;
+  gridValue.textContent = `${squareSize}x${squareSize}`;
 });
 
 
-const black = document.querySelector('#black');
-black.addEventListener('click', function(){
-    let val = document.getElementById('slider').value;
-    let cell = grid.children;
-    for (let i = 0; i < val*val; i++) {
-        cell[i].addEventListener('pointerover', func)
-    }
-})
 
+const resetBtn = document.querySelector('.reset');
+const applyGridSize = document.querySelector('.apply');
 
-const reset = document.querySelector("#reset")
-reset.addEventListener('click', function(){
-    let val = document.getElementById('slider').value;
-    let cell = grid.children;
-    for(let i = 0; i < val*val; i++){
-        cell[i].style.backgroundColor = "white";
-    }
+// here we are adding event listeners to the buttons 
+// this works because reset() applies the correct squareSize by calling createGrid(squareSize);
+applyGridSize.addEventListener('click', function () {
+  reset();
 });
 
-
-createGrid();
-
+resetBtn.addEventListener('click', reset);
 
